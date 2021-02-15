@@ -1,23 +1,25 @@
-x-config:
-  - &EXPRESS_BUILDER "expressjs-demo"
-  - &CONTAINER_NAME "express-demo"
-
 version: '3.7'
 
 services:
-  # build a node server image to run our code on (docker-compose build node)
+  # mount current src files and run on node builder (docker-compose up dev)
   express:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: *EXPRESS_BUILDER
-    container_name: build_node_demo
-  # mount current src files and run on node builder (docker-compose up dev)
-  dev:
-    image: *EXPRESS_BUILDER
-    container_name: *CONTAINER_NAME
+      dockerfile: Dockerfile  
+    image: express-blog/builder:0.0.1
+    container_name: express-blog-container
     ports:
       - '8080:8080'
     volumes:
       - ./src:/usr/src/app/src 
     command: npm run start
+  ddb:
+    container_name: ddb-blog
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodata:/home/dynamodblocal
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ."    
+volumes:
+  dynamodata: {}    
